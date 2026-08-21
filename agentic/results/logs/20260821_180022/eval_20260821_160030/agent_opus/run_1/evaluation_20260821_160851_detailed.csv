@@ -1,0 +1,69 @@
+conversation_group_id,tag,turn_id,metric_identifier,metric_metadata,result,score,threshold,reason,query,response,execution_time,evaluation_latency,api_input_tokens,api_output_tokens,judge_llm_input_tokens,judge_llm_output_tokens,embedding_tokens,judge_scores,time_to_first_token,streaming_duration,agent_latency,tokens_per_second,tool_calls,contexts,expected_response,expected_intent,expected_keywords,expected_tool_calls
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_status,,PASS,1.0,,Phase matches: Completed; All condition assertions passed,"The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Option 1 — Patch the Service selector to match the pod labels
+**Diagnosis:** Correct the Service selector to `app=svc-selector-demo` so it matches the existing pod labels. This is the least disruptive fix — it changes only the Service object and requires no pod restart. (Confidence: )
+**Root Cause:** Service selector `app=svc-selector-app` does not match pod label `app=svc-selector-demo`.
+**Proposed Actions:**
+1. [mutation] Update the Service selector to match the pod label app=svc-selector-demo
+2. [verification] Verify the Endpoints object now lists the pod IP (10.129.2.23)
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Option 2 — Patch the Deployment pod template labels to match the Service selector
+**Diagnosis:** Change the Deployment's pod template labels to `app=svc-selector-app` to match the existing Service selector. This triggers a rolling restart of the pods. (Confidence: )
+**Root Cause:** Service selector `app=svc-selector-app` does not match pod label `app=svc-selector-demo`.
+**Proposed Actions:**
+1. [mutation] Update the Deployment's pod template label and selector to app=svc-selector-app
+2. [wait] Wait for the new pods to roll out successfully
+3. [verification] Verify the Endpoints object now lists the new pod IP
+**Risk:**  | **Reversible:** Partial
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",0.0002735269954428077,0.0002735269954428077,0,0,0,0,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""Phase matches: Completed; All condition assertions passed"", ""judge_input_tokens"": 0, ""judge_output_tokens"": 0, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_evaluation_correctness,,PASS,1.0,0.75,"OpenShift AgenticRun evaluation correctness: diagnosis=1.00, execution=N/A, verification=N/A, avg=1.00 — The diagnosis is correct and specific: the Service selector and pod labels do not match, which explains why the Service has zero endpoints despite healthy pods. However, only the analysis phase ran, so there was no actual remediation execution or verification; those dimensions are therefore N/A. The proposed fixes and verification steps are appropriate, but they remain recommendations rather than completed actions.","The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Option 1 — Patch the Service selector to match the pod labels
+**Diagnosis:** Correct the Service selector to `app=svc-selector-demo` so it matches the existing pod labels. This is the least disruptive fix — it changes only the Service object and requires no pod restart. (Confidence: )
+**Root Cause:** Service selector `app=svc-selector-app` does not match pod label `app=svc-selector-demo`.
+**Proposed Actions:**
+1. [mutation] Update the Service selector to match the pod label app=svc-selector-demo
+2. [verification] Verify the Endpoints object now lists the pod IP (10.129.2.23)
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Option 2 — Patch the Deployment pod template labels to match the Service selector
+**Diagnosis:** Change the Deployment's pod template labels to `app=svc-selector-app` to match the existing Service selector. This triggers a rolling restart of the pods. (Confidence: )
+**Root Cause:** Service selector `app=svc-selector-app` does not match pod label `app=svc-selector-demo`.
+**Proposed Actions:**
+1. [mutation] Update the Deployment's pod template label and selector to app=svc-selector-app
+2. [wait] Wait for the new pods to roll out successfully
+3. [verification] Verify the Endpoints object now lists the new pod IP
+**Risk:**  | **Reversible:** Partial
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",1.65683170594275,1.65683170594275,0,0,1998,114,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""OpenShift AgenticRun evaluation correctness: diagnosis=1.00, execution=N/A, verification=N/A, avg=1.00 \u2014 The diagnosis is correct and specific: the Service selector and pod labels do not match, which explains why the Service has zero endpoints despite healthy pods. However, only the analysis phase ran, so there was no actual remediation execution or verification; those dimensions are therefore N/A. The proposed fixes and verification steps are appropriate, but they remain recommendations rather than completed actions."", ""judge_input_tokens"": 1998, ""judge_output_tokens"": 114, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,

@@ -15,16 +15,34 @@ llm:
 agents:
   enabled: true
   default:
-    agent: eval_agent
+    agent: [agent_openai, agent_gemini, agent_opus]
+    repeat: 3
     agent_config:
       timeout: 600
-  eval_agent:
+  agent_openai:
     type: openshift_agentic_run
     namespace: openshift-lightspeed
     auto_approve: true
     cleanup_openshift_agentic_runs: false
     timeout: 600
     poll_interval: 5
+    agent_ref: default
+  agent_gemini:
+    type: openshift_agentic_run
+    namespace: openshift-lightspeed
+    auto_approve: true
+    cleanup_openshift_agentic_runs: false
+    timeout: 600
+    poll_interval: 5
+    agent_ref: gemini
+  agent_opus:
+    type: openshift_agentic_run
+    namespace: openshift-lightspeed
+    auto_approve: true
+    cleanup_openshift_agentic_runs: false
+    timeout: 600
+    poll_interval: 5
+    agent_ref: opus
 
 storage:
   - type: file

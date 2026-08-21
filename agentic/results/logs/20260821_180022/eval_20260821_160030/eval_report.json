@@ -1,0 +1,118 @@
+{
+  "summary": {
+    "timestamp": "2026-08-21T16:00:30+00:00",
+    "total_agents": 3,
+    "total_runs": 9,
+    "repeat": 3
+  },
+  "agents": {
+    "agent_openai": {
+      "agent_name": "agent_openai",
+      "runs_requested": 3,
+      "runs_succeeded": 3,
+      "conversations_count": 1,
+      "overall": {
+        "pass_rate_mean": 100.0,
+        "pass_rate_std": 0.0,
+        "total_agent_tokens": 0.0,
+        "total_judge_tokens": 7563.0,
+        "total_embedding_tokens": 0.0,
+        "agent_tokens_mean": 0.0,
+        "judge_tokens_mean": 2521.0,
+        "pass_at_k": 1.0
+      }
+    },
+    "agent_gemini": {
+      "agent_name": "agent_gemini",
+      "runs_requested": 3,
+      "runs_succeeded": 3,
+      "conversations_count": 1,
+      "overall": {
+        "pass_rate_mean": 100.0,
+        "pass_rate_std": 0.0,
+        "total_agent_tokens": 0.0,
+        "total_judge_tokens": 6378.0,
+        "total_embedding_tokens": 0.0,
+        "agent_tokens_mean": 0.0,
+        "judge_tokens_mean": 2126.0,
+        "pass_at_k": 1.0
+      }
+    },
+    "agent_opus": {
+      "agent_name": "agent_opus",
+      "runs_requested": 3,
+      "runs_succeeded": 3,
+      "conversations_count": 1,
+      "overall": {
+        "pass_rate_mean": 100.0,
+        "pass_rate_std": 0.0,
+        "total_agent_tokens": 0.0,
+        "total_judge_tokens": 6430.0,
+        "total_embedding_tokens": 0.0,
+        "agent_tokens_mean": 0.0,
+        "judge_tokens_mean": 2143.3333333333335,
+        "pass_at_k": 1.0
+      }
+    }
+  },
+  "comparison": {
+    "deltas": [
+      {
+        "agent_a": "agent_gemini",
+        "agent_b": "agent_openai",
+        "pass_rate_mean_delta": 0.0,
+        "agent_tokens_mean_delta": 0.0,
+        "score_deltas": {
+          "custom:openshift_agentic_run_status": 0.0,
+          "custom:openshift_agentic_run_evaluation_correctness": 0.013333333333333308
+        }
+      },
+      {
+        "agent_a": "agent_gemini",
+        "agent_b": "agent_opus",
+        "pass_rate_mean_delta": 0.0,
+        "agent_tokens_mean_delta": 0.0,
+        "score_deltas": {
+          "custom:openshift_agentic_run_status": 0.0,
+          "custom:openshift_agentic_run_evaluation_correctness": 0.0
+        }
+      },
+      {
+        "agent_a": "agent_openai",
+        "agent_b": "agent_opus",
+        "pass_rate_mean_delta": 0.0,
+        "agent_tokens_mean_delta": 0.0,
+        "score_deltas": {
+          "custom:openshift_agentic_run_status": 0.0,
+          "custom:openshift_agentic_run_evaluation_correctness": -0.013333333333333308
+        }
+      }
+    ],
+    "rankings": {
+      "by_pass_rate": [
+        "agent_gemini",
+        "agent_openai",
+        "agent_opus"
+      ],
+      "by_latency": [],
+      "by_tokens": [
+        "agent_gemini",
+        "agent_openai",
+        "agent_opus"
+      ],
+      "by_metric": {
+        "custom:openshift_agentic_run_evaluation_correctness": [
+          "agent_gemini",
+          "agent_opus",
+          "agent_openai"
+        ],
+        "custom:openshift_agentic_run_status": [
+          "agent_gemini",
+          "agent_openai",
+          "agent_opus"
+        ]
+      }
+    },
+    "incomparable": []
+  }
+}

@@ -1,0 +1,99 @@
+conversation_group_id,tag,turn_id,metric_identifier,metric_metadata,result,score,threshold,reason,query,response,execution_time,evaluation_latency,api_input_tokens,api_output_tokens,judge_llm_input_tokens,judge_llm_output_tokens,embedding_tokens,judge_scores,time_to_first_token,streaming_duration,agent_latency,tokens_per_second,tool_calls,contexts,expected_response,expected_intent,expected_keywords,expected_tool_calls
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_status,,PASS,1.0,,Phase matches: Completed; All condition assertions passed,"The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Patch the Service selector to match the running pods
+**Diagnosis:** `svc-selector-test` contains a single workload, `Deployment/svc-selector-demo`, and it is healthy: `1/1` ready, pod `svc-selector-demo-66d55b6889-gkcnl` is `Running`, `Ready=True`, and its logs show repeated successful readiness probes (`200`) rather than application failures. This rules out an app crash or infra outage.
+
+`Service/svc-selector-svc` is configured with selector `app=svc-selector-app`, while `Deployment/svc-selector-demo` uses pod labels `app=svc-selector-demo`. Because the service selector does not match the pod labels, Kubernetes does not attach any backends: `Endpoints/svc-selector-svc` has no subsets and `EndpointSlice/svc-selector-svc-jxffp` has `endpoints: null` and `ports: null`.
+
+Cross-service correlation shows no broader namespace issue: there is only one workload in `svc-selector-test`, recent namespace events only show normal pod scheduling/startup around `2026-08-21T15:47:04Z`–`15:47:05Z`, and no infra-style errors (node pressure, restarts, timeouts, image pull failures, probe failures) are present. The failure scope is therefore isolated to service-to-pod selection, not application logic or cluster infrastructure. (Confidence: )
+**Root Cause:** `Service/svc-selector-svc` uses selector `app=svc-selector-app`, but the only healthy backend pod is labeled `app=svc-selector-demo`, so the service has no endpoints.
+**Proposed Actions:**
+1. [mutation] Update the service selector to match the existing healthy pod label.
+2. [post-check] Confirm the service selector now points to the deployment label.
+3. [wait] Wait for the endpoints controller to populate a backend address.
+4. [post-check] Verify the service now has endpoint addresses.
+5. [post-check] Verify the generated EndpointSlice contains the backend pod endpoint and port.
+6. [post-check] Confirm the selected backend pod remains ready and matches the selector.
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Standardize the Deployment label to match the Service
+**Diagnosis:** The immediate outage is caused by the service selector mismatch, but the deeper configuration issue is inconsistent label conventions between the service and deployment definitions. Today that produces a service with no endpoints; future rollouts would keep failing until one side is standardized.
+
+The healthy pod already serves traffic on port `8080`, and no other workloads or infrastructure events indicate a shared dependency failure. The causality chain is: healthy pod exists -> service selector does not match pod labels -> endpoints controller creates empty `Endpoints`/`EndpointSlice` -> service receives no traffic.
+
+A deployment-label fix is a valid alternative if `svc-selector-app` is the intended canonical label used by other manifests or consumers. (Confidence: )
+**Root Cause:** The application and service disagree on the canonical `app` label: the deployment labels pods as `app=svc-selector-demo` while the service expects `app=svc-selector-app`.
+**Proposed Actions:**
+1. [mutation] Change the deployment selector and pod template label to the canonical label expected by the service.
+2. [wait] Wait for the deployment to recreate pods with the new label and become available.
+3. [post-check] Verify the new pod exists with the expected label.
+4. [wait] Wait for the service endpoints to populate from the newly labeled pod.
+5. [post-check] Verify the service now has backend endpoints.
+6. [post-check] Verify the EndpointSlice reflects the replacement pod endpoint.
+**Risk:**  | **Reversible:** Partial
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",0.0002759599592536688,0.0002759599592536688,0,0,0,0,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""Phase matches: Completed; All condition assertions passed"", ""judge_input_tokens"": 0, ""judge_output_tokens"": 0, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_evaluation_correctness,,PASS,0.98,0.75,"OpenShift AgenticRun evaluation correctness: diagnosis=0.98, execution=N/A, verification=N/A, avg=0.98 — The diagnosis is correct and specific: the service selector `app=svc-selector-app` does not match the healthy deployment pods labeled `app=svc-selector-demo`, which explains the empty Endpoints/EndpointSlice and lack of traffic. No execution phase ran, so execution is N/A rather than scored. Verification was not configured, and the summary does not show any post-fix checks actually performed.","The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Patch the Service selector to match the running pods
+**Diagnosis:** `svc-selector-test` contains a single workload, `Deployment/svc-selector-demo`, and it is healthy: `1/1` ready, pod `svc-selector-demo-66d55b6889-gkcnl` is `Running`, `Ready=True`, and its logs show repeated successful readiness probes (`200`) rather than application failures. This rules out an app crash or infra outage.
+
+`Service/svc-selector-svc` is configured with selector `app=svc-selector-app`, while `Deployment/svc-selector-demo` uses pod labels `app=svc-selector-demo`. Because the service selector does not match the pod labels, Kubernetes does not attach any backends: `Endpoints/svc-selector-svc` has no subsets and `EndpointSlice/svc-selector-svc-jxffp` has `endpoints: null` and `ports: null`.
+
+Cross-service correlation shows no broader namespace issue: there is only one workload in `svc-selector-test`, recent namespace events only show normal pod scheduling/startup around `2026-08-21T15:47:04Z`–`15:47:05Z`, and no infra-style errors (node pressure, restarts, timeouts, image pull failures, probe failures) are present. The failure scope is therefore isolated to service-to-pod selection, not application logic or cluster infrastructure. (Confidence: )
+**Root Cause:** `Service/svc-selector-svc` uses selector `app=svc-selector-app`, but the only healthy backend pod is labeled `app=svc-selector-demo`, so the service has no endpoints.
+**Proposed Actions:**
+1. [mutation] Update the service selector to match the existing healthy pod label.
+2. [post-check] Confirm the service selector now points to the deployment label.
+3. [wait] Wait for the endpoints controller to populate a backend address.
+4. [post-check] Verify the service now has endpoint addresses.
+5. [post-check] Verify the generated EndpointSlice contains the backend pod endpoint and port.
+6. [post-check] Confirm the selected backend pod remains ready and matches the selector.
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Standardize the Deployment label to match the Service
+**Diagnosis:** The immediate outage is caused by the service selector mismatch, but the deeper configuration issue is inconsistent label conventions between the service and deployment definitions. Today that produces a service with no endpoints; future rollouts would keep failing until one side is standardized.
+
+The healthy pod already serves traffic on port `8080`, and no other workloads or infrastructure events indicate a shared dependency failure. The causality chain is: healthy pod exists -> service selector does not match pod labels -> endpoints controller creates empty `Endpoints`/`EndpointSlice` -> service receives no traffic.
+
+A deployment-label fix is a valid alternative if `svc-selector-app` is the intended canonical label used by other manifests or consumers. (Confidence: )
+**Root Cause:** The application and service disagree on the canonical `app` label: the deployment labels pods as `app=svc-selector-demo` while the service expects `app=svc-selector-app`.
+**Proposed Actions:**
+1. [mutation] Change the deployment selector and pod template label to the canonical label expected by the service.
+2. [wait] Wait for the deployment to recreate pods with the new label and become available.
+3. [post-check] Verify the new pod exists with the expected label.
+4. [wait] Wait for the service endpoints to populate from the newly labeled pod.
+5. [post-check] Verify the service now has backend endpoints.
+6. [post-check] Verify the EndpointSlice reflects the replacement pod endpoint.
+**Risk:**  | **Reversible:** Partial
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",1.4856388199841604,1.4856388199841604,0,0,2469,121,0,"[{""judge_id"": ""primary"", ""score"": 0.98, ""reason"": ""OpenShift AgenticRun evaluation correctness: diagnosis=0.98, execution=N/A, verification=N/A, avg=0.98 \u2014 The diagnosis is correct and specific: the service selector `app=svc-selector-app` does not match the healthy deployment pods labeled `app=svc-selector-demo`, which explains the empty Endpoints/EndpointSlice and lack of traffic. No execution phase ran, so execution is N/A rather than scored. Verification was not configured, and the summary does not show any post-fix checks actually performed."", ""judge_input_tokens"": 2469, ""judge_output_tokens"": 121, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,

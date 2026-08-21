@@ -1,0 +1,73 @@
+conversation_group_id,tag,turn_id,metric_identifier,metric_metadata,result,score,threshold,reason,query,response,execution_time,evaluation_latency,api_input_tokens,api_output_tokens,judge_llm_input_tokens,judge_llm_output_tokens,embedding_tokens,judge_scores,time_to_first_token,streaming_duration,agent_latency,tokens_per_second,tool_calls,contexts,expected_response,expected_intent,expected_keywords,expected_tool_calls
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_status,,PASS,1.0,,Phase matches: Completed; All condition assertions passed,"The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Option 1: Patch the Service selector to match existing Pod labels
+**Diagnosis:** Update the Service selector to `app=svc-selector-demo` so it matches the running Pod. (Confidence: )
+**Root Cause:** Service selector `app=svc-selector-app` does not match the Pod label `app=svc-selector-demo`.
+**Proposed Actions:**
+1. [mutation] Update the Service selector from app=svc-selector-app to app=svc-selector-demo
+2. [verification] Verify that the Endpoints object now has populated subsets with Pod IPs
+3. [verification] Verify EndpointSlice has backend addresses
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Option 2: Patch the Deployment labels to match the existing Service selector
+**Diagnosis:** Update the Deployment's Pod template labels to `app=svc-selector-app` so Pods match the Service selector. (Confidence: )
+**Root Cause:** Service selector `app=svc-selector-app` does not match the Pod label `app=svc-selector-demo`.
+**Proposed Actions:**
+1. [mutation] Update Pod template label from app=svc-selector-demo to app=svc-selector-app so Pods match the Service selector
+2. [mutation] Update Deployment selector to match the new Pod template label. NOTE: Deployment selectors are immutable after creation — if this fails, the Deployment must be recreated. See fallback action below.
+3. [verification] Wait for the rolling update to complete
+4. [verification] Verify that the Endpoints object now has populated subsets
+**Risk:**  | **Reversible:** Partial
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",0.00025093299336731434,0.00025093299336731434,0,0,0,0,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""Phase matches: Completed; All condition assertions passed"", ""judge_input_tokens"": 0, ""judge_output_tokens"": 0, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_evaluation_correctness,,PASS,1.0,0.75,"OpenShift AgenticRun evaluation correctness: diagnosis=1.00, execution=N/A, verification=N/A, avg=1.00 — The diagnosis is correct and specific: the Service selector `app=svc-selector-app` does not match the running Pods labeled `app=svc-selector-demo`, which explains why the Service has no endpoints despite healthy Pods. No execution phase ran, so there were no remediation actions to evaluate, and verification was not configured; the proposed verification checks are appropriate but were not actually performed.","The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Option 1: Patch the Service selector to match existing Pod labels
+**Diagnosis:** Update the Service selector to `app=svc-selector-demo` so it matches the running Pod. (Confidence: )
+**Root Cause:** Service selector `app=svc-selector-app` does not match the Pod label `app=svc-selector-demo`.
+**Proposed Actions:**
+1. [mutation] Update the Service selector from app=svc-selector-app to app=svc-selector-demo
+2. [verification] Verify that the Endpoints object now has populated subsets with Pod IPs
+3. [verification] Verify EndpointSlice has backend addresses
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Option 2: Patch the Deployment labels to match the existing Service selector
+**Diagnosis:** Update the Deployment's Pod template labels to `app=svc-selector-app` so Pods match the Service selector. (Confidence: )
+**Root Cause:** Service selector `app=svc-selector-app` does not match the Pod label `app=svc-selector-demo`.
+**Proposed Actions:**
+1. [mutation] Update Pod template label from app=svc-selector-demo to app=svc-selector-app so Pods match the Service selector
+2. [mutation] Update Deployment selector to match the new Pod template label. NOTE: Deployment selectors are immutable after creation — if this fails, the Deployment must be recreated. See fallback action below.
+3. [verification] Wait for the rolling update to complete
+4. [verification] Verify that the Endpoints object now has populated subsets
+**Risk:**  | **Reversible:** Partial
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",1.8697688840329647,1.8697688840329647,0,0,2024,117,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""OpenShift AgenticRun evaluation correctness: diagnosis=1.00, execution=N/A, verification=N/A, avg=1.00 \u2014 The diagnosis is correct and specific: the Service selector `app=svc-selector-app` does not match the running Pods labeled `app=svc-selector-demo`, which explains why the Service has no endpoints despite healthy Pods. No execution phase ran, so there were no remediation actions to evaluate, and verification was not configured; the proposed verification checks are appropriate but were not actually performed."", ""judge_input_tokens"": 2024, ""judge_output_tokens"": 117, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,

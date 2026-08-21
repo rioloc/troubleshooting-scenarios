@@ -1,0 +1,69 @@
+conversation_group_id,tag,turn_id,metric_identifier,metric_metadata,result,score,threshold,reason,query,response,execution_time,evaluation_latency,api_input_tokens,api_output_tokens,judge_llm_input_tokens,judge_llm_output_tokens,embedding_tokens,judge_scores,time_to_first_token,streaming_duration,agent_latency,tokens_per_second,tool_calls,contexts,expected_response,expected_intent,expected_keywords,expected_tool_calls
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_status,,PASS,1.0,,Phase matches: Completed; All condition assertions passed,"The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Update Service Selector to Match Deployment Pod Labels
+**Diagnosis:** The Service `svc-selector-svc` in the namespace `svc-selector-test` has no active endpoints (and thus routes no traffic) because its selector is set to `app: svc-selector-app`. However, the backing application Pods managed by the Deployment `svc-selector-demo` are labeled with `app: svc-selector-demo`. This label selector mismatch prevents Kubernetes from routing traffic to the healthy backing container. (Confidence: )
+**Root Cause:** Service selector mismatch: Service is configured with selector 'app: svc-selector-app' while Deployment pods have label 'app: svc-selector-demo'.
+**Proposed Actions:**
+1. [mutation] Updates the selector of 'svc-selector-svc' from 'app: svc-selector-app' to 'app: svc-selector-demo' to match the existing pod labels.
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Recreate Deployment with Selector Matching the Service
+**Diagnosis:** The Service expects pods labeled with `app: svc-selector-app`. This alternative option aligns the deployment with the Service's selector instead of changing the Service itself. Because Deployment pod selectors are immutable after creation, this requires deleting and recreating the Deployment with the updated labels. (Confidence: )
+**Root Cause:** Service selector mismatch: Service is configured with selector 'app: svc-selector-app' while Deployment pods have label 'app: svc-selector-demo'.
+**Proposed Actions:**
+1. [pre-check] Back up the current deployment manifest.
+2. [mutation] Delete the old deployment with incorrect labels.
+3. [mutation] Create the new deployment with updated service-aligned selector labels and a matching name.
+4. [wait] Wait for the updated deployment to complete rollout.
+**Risk:**  | **Reversible:** Reversible
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",0.0002587799681350589,0.0002587799681350589,0,0,0,0,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""Phase matches: Completed; All condition assertions passed"", ""judge_input_tokens"": 0, ""judge_output_tokens"": 0, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_evaluation_correctness,,PASS,1.0,0.75,"OpenShift AgenticRun evaluation correctness: diagnosis=1.00, execution=N/A, verification=N/A, avg=1.00 — The diagnosis is correct and specific: the service selector does not match the pod labels, which explains the lack of endpoints despite healthy pods. However, no execution phase ran, so there were no actual remediation actions to evaluate, and no verification phase was configured, so nothing confirmed the fix. The proposed remediation is sound, but it remains only a recommendation, not an executed or verified outcome.","The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Update Service Selector to Match Deployment Pod Labels
+**Diagnosis:** The Service `svc-selector-svc` in the namespace `svc-selector-test` has no active endpoints (and thus routes no traffic) because its selector is set to `app: svc-selector-app`. However, the backing application Pods managed by the Deployment `svc-selector-demo` are labeled with `app: svc-selector-demo`. This label selector mismatch prevents Kubernetes from routing traffic to the healthy backing container. (Confidence: )
+**Root Cause:** Service selector mismatch: Service is configured with selector 'app: svc-selector-app' while Deployment pods have label 'app: svc-selector-demo'.
+**Proposed Actions:**
+1. [mutation] Updates the selector of 'svc-selector-svc' from 'app: svc-selector-app' to 'app: svc-selector-demo' to match the existing pod labels.
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Recreate Deployment with Selector Matching the Service
+**Diagnosis:** The Service expects pods labeled with `app: svc-selector-app`. This alternative option aligns the deployment with the Service's selector instead of changing the Service itself. Because Deployment pod selectors are immutable after creation, this requires deleting and recreating the Deployment with the updated labels. (Confidence: )
+**Root Cause:** Service selector mismatch: Service is configured with selector 'app: svc-selector-app' while Deployment pods have label 'app: svc-selector-demo'.
+**Proposed Actions:**
+1. [pre-check] Back up the current deployment manifest.
+2. [mutation] Delete the old deployment with incorrect labels.
+3. [mutation] Create the new deployment with updated service-aligned selector labels and a matching name.
+4. [wait] Wait for the updated deployment to complete rollout.
+**Risk:**  | **Reversible:** Reversible
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",2.2847849330864847,2.2847849330864847,0,0,2066,119,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""OpenShift AgenticRun evaluation correctness: diagnosis=1.00, execution=N/A, verification=N/A, avg=1.00 \u2014 The diagnosis is correct and specific: the service selector does not match the pod labels, which explains the lack of endpoints despite healthy pods. However, no execution phase ran, so there were no actual remediation actions to evaluate, and no verification phase was configured, so nothing confirmed the fix. The proposed remediation is sound, but it remains only a recommendation, not an executed or verified outcome."", ""judge_input_tokens"": 2066, ""judge_output_tokens"": 119, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,

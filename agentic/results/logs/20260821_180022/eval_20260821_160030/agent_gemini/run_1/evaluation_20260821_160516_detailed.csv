@@ -1,0 +1,53 @@
+conversation_group_id,tag,turn_id,metric_identifier,metric_metadata,result,score,threshold,reason,query,response,execution_time,evaluation_latency,api_input_tokens,api_output_tokens,judge_llm_input_tokens,judge_llm_output_tokens,embedding_tokens,judge_scores,time_to_first_token,streaming_duration,agent_latency,tokens_per_second,tool_calls,contexts,expected_response,expected_intent,expected_keywords,expected_tool_calls
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_status,,PASS,1.0,,Phase matches: Completed; All condition assertions passed,"The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+1 option(s) proposed
+
+### Option 0 (Approved): Update Service Selector to Target Active Pods
+**Diagnosis:** An investigation of the `svc-selector-svc` service in the `svc-selector-test` namespace revealed that it currently has no endpoints and serves no traffic. Further inspection of the service definition showed that its pod selector is configured as `app: svc-selector-app`. However, the only active deployment in this namespace is `svc-selector-demo`, whose backing pods are labeled with `app: svc-selector-demo`. Due to this selector mismatch, Kubernetes is unable to map the pod IPs to the service's endpoints list, causing all ingress and service-to-service traffic directed at `svc-selector-svc` to fail. Updating the service selector to match the active pod labels will immediately resolve the issue. (Confidence: )
+**Root Cause:** Service selector mismatch: svc-selector-svc selector targets 'app=svc-selector-app' but backend pods are labeled 'app=svc-selector-demo'.
+**Proposed Actions:**
+1. [pre-check] Pre-check: Verify the current selector of the service before making changes.
+2. [mutation] Mutation: Patch the service selector to target 'svc-selector-demo' so it matches the running deployment pods.
+3. [post-check] Post-check: Verify that the service's endpoint list is populated now that the selector matches.
+**Risk:**  | **Reversible:** Reversible
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",0.00038839399348944426,0.00038839399348944426,0,0,0,0,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""Phase matches: Completed; All condition assertions passed"", ""judge_input_tokens"": 0, ""judge_output_tokens"": 0, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_evaluation_correctness,,PASS,0.98,0.75,"OpenShift AgenticRun evaluation correctness: diagnosis=0.98, execution=N/A, verification=N/A, avg=0.98 — The diagnosis matches the expected root cause: the service selector points to app=svc-selector-app while the running pods are labeled app=svc-selector-demo, which explains the zero endpoints and lack of traffic. No execution phase ran, so there were no remediation actions actually applied to evaluate, and no verification phase ran to confirm endpoints were restored.","The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+1 option(s) proposed
+
+### Option 0 (Approved): Update Service Selector to Target Active Pods
+**Diagnosis:** An investigation of the `svc-selector-svc` service in the `svc-selector-test` namespace revealed that it currently has no endpoints and serves no traffic. Further inspection of the service definition showed that its pod selector is configured as `app: svc-selector-app`. However, the only active deployment in this namespace is `svc-selector-demo`, whose backing pods are labeled with `app: svc-selector-demo`. Due to this selector mismatch, Kubernetes is unable to map the pod IPs to the service's endpoints list, causing all ingress and service-to-service traffic directed at `svc-selector-svc` to fail. Updating the service selector to match the active pod labels will immediately resolve the issue. (Confidence: )
+**Root Cause:** Service selector mismatch: svc-selector-svc selector targets 'app=svc-selector-app' but backend pods are labeled 'app=svc-selector-demo'.
+**Proposed Actions:**
+1. [pre-check] Pre-check: Verify the current selector of the service before making changes.
+2. [mutation] Mutation: Patch the service selector to target 'svc-selector-demo' so it matches the running deployment pods.
+3. [post-check] Post-check: Verify that the service's endpoint list is populated now that the selector matches.
+**Risk:**  | **Reversible:** Reversible
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",1.5463768109912053,1.5463768109912053,0,0,1970,109,0,"[{""judge_id"": ""primary"", ""score"": 0.98, ""reason"": ""OpenShift AgenticRun evaluation correctness: diagnosis=0.98, execution=N/A, verification=N/A, avg=0.98 \u2014 The diagnosis matches the expected root cause: the service selector points to app=svc-selector-app while the running pods are labeled app=svc-selector-demo, which explains the zero endpoints and lack of traffic. No execution phase ran, so there were no remediation actions actually applied to evaluate, and no verification phase ran to confirm endpoints were restored."", ""judge_input_tokens"": 1970, ""judge_output_tokens"": 109, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,

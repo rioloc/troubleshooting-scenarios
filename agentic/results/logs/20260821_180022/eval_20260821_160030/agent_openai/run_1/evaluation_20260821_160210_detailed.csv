@@ -1,0 +1,83 @@
+conversation_group_id,tag,turn_id,metric_identifier,metric_metadata,result,score,threshold,reason,query,response,execution_time,evaluation_latency,api_input_tokens,api_output_tokens,judge_llm_input_tokens,judge_llm_output_tokens,embedding_tokens,judge_scores,time_to_first_token,streaming_duration,agent_latency,tokens_per_second,tool_calls,contexts,expected_response,expected_intent,expected_keywords,expected_tool_calls
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_status,,PASS,1.0,,Phase matches: Completed; All condition assertions passed,"The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Patch the Service selector to match the running deployment
+**Diagnosis:** `svc-selector-svc` in `svc-selector-test` selects pods with `app=svc-selector-app`, but the only running workload is `deployment/svc-selector-demo`, whose pod template and live pod labels are `app=svc-selector-demo`. Because of that mismatch, the Service controller creates no backend endpoints: `Endpoints.subsets` is `null` and the corresponding `EndpointSlice` has an empty `endpoints` list. The application itself is healthy: the deployment is `1/1` available, the pod is `Running` and `Ready=True`, and nginx logs show repeated `200` responses to readiness probes. This is therefore not an application or node failure; it is a Kubernetes Service-to-pod label selection misconfiguration isolated to this namespace. (Confidence: )
+**Root Cause:** Service selector does not match the running pod labels, so the Service has no endpoints
+**Proposed Actions:**
+1. [pre-check] Pre-check the current incorrect selector before mutation
+2. [mutation] Update the Service selector to match the running pod label
+3. [wait] Wait until the Service controller publishes backend endpoints
+4. [post-check] Confirm the Endpoints object now contains the backend pod IP and port
+5. [post-check] Confirm EndpointSlice now lists the selected pod
+6. [post-check] Verify the selected backing pod is still Ready
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Retag the deployment pods to match the existing Service selector
+**Diagnosis:** The Service was apparently designed to target pods labeled `app=svc-selector-app`, but the actual deployment template labels are `app=svc-selector-demo`. Since Service selectors operate strictly on labels, the Service never matches the pod even though the pod is healthy and serving traffic internally. If the intended naming convention is for workloads to use `app=svc-selector-app`, correcting the deployment template labels can restore consistency between workload and Service. This option is more disruptive because it changes the pod template and causes a rollout, but it may better align with the original intended resource naming. (Confidence: )
+**Root Cause:** The deployment uses a different app label than the Service expects, leaving the Service without endpoints
+**Proposed Actions:**
+1. [pre-check] Pre-check current deployment selector and pod template labels
+2. [mutation] Change the pod template label so new pods match the Service selector
+3. [wait] Wait for the replacement pod to become Ready after the rollout
+4. [post-check] Verify a new pod exists with the corrected label and is Ready
+5. [post-check] Confirm the Service now has backend endpoints
+6. [post-check] Confirm EndpointSlice points at the new pod
+**Risk:**  | **Reversible:** Partial
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",0.0005593360401690006,0.0005593360401690006,0,0,0,0,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""Phase matches: Completed; All condition assertions passed"", ""judge_input_tokens"": 0, ""judge_output_tokens"": 0, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_evaluation_correctness,,PASS,0.98,0.75,"OpenShift AgenticRun evaluation correctness: diagnosis=0.98, execution=N/A, verification=N/A, avg=0.98 — The diagnosis matches the expected root cause precisely: the Service selector and the Deployment pod labels do not align, leaving the Service with no endpoints despite healthy pods. The proposed remediation is also appropriate and safe, with the primary fix correctly targeting the Service selector; the alternative of retagging pods is valid but more disruptive. No execution or verification phases ran, so those dimensions are N/A.","The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+2 option(s) proposed
+
+### Option 0 (Approved): Patch the Service selector to match the running deployment
+**Diagnosis:** `svc-selector-svc` in `svc-selector-test` selects pods with `app=svc-selector-app`, but the only running workload is `deployment/svc-selector-demo`, whose pod template and live pod labels are `app=svc-selector-demo`. Because of that mismatch, the Service controller creates no backend endpoints: `Endpoints.subsets` is `null` and the corresponding `EndpointSlice` has an empty `endpoints` list. The application itself is healthy: the deployment is `1/1` available, the pod is `Running` and `Ready=True`, and nginx logs show repeated `200` responses to readiness probes. This is therefore not an application or node failure; it is a Kubernetes Service-to-pod label selection misconfiguration isolated to this namespace. (Confidence: )
+**Root Cause:** Service selector does not match the running pod labels, so the Service has no endpoints
+**Proposed Actions:**
+1. [pre-check] Pre-check the current incorrect selector before mutation
+2. [mutation] Update the Service selector to match the running pod label
+3. [wait] Wait until the Service controller publishes backend endpoints
+4. [post-check] Confirm the Endpoints object now contains the backend pod IP and port
+5. [post-check] Confirm EndpointSlice now lists the selected pod
+6. [post-check] Verify the selected backing pod is still Ready
+**Risk:**  | **Reversible:** Reversible
+
+### Option 1 : Retag the deployment pods to match the existing Service selector
+**Diagnosis:** The Service was apparently designed to target pods labeled `app=svc-selector-app`, but the actual deployment template labels are `app=svc-selector-demo`. Since Service selectors operate strictly on labels, the Service never matches the pod even though the pod is healthy and serving traffic internally. If the intended naming convention is for workloads to use `app=svc-selector-app`, correcting the deployment template labels can restore consistency between workload and Service. This option is more disruptive because it changes the pod template and causes a rollout, but it may better align with the original intended resource naming. (Confidence: )
+**Root Cause:** The deployment uses a different app label than the Service expects, leaving the Service without endpoints
+**Proposed Actions:**
+1. [pre-check] Pre-check current deployment selector and pod template labels
+2. [mutation] Change the pod template label so new pods match the Service selector
+3. [wait] Wait for the replacement pod to become Ready after the rollout
+4. [post-check] Verify a new pod exists with the corrected label and is Ready
+5. [post-check] Confirm the Service now has backend endpoints
+6. [post-check] Confirm EndpointSlice points at the new pod
+**Risk:**  | **Reversible:** Partial
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",1.8926871869480237,1.8926871869480237,0,0,2278,119,0,"[{""judge_id"": ""primary"", ""score"": 0.98, ""reason"": ""OpenShift AgenticRun evaluation correctness: diagnosis=0.98, execution=N/A, verification=N/A, avg=0.98 \u2014 The diagnosis matches the expected root cause precisely: the Service selector and the Deployment pod labels do not align, leaving the Service with no endpoints despite healthy pods. The proposed remediation is also appropriate and safe, with the primary fix correctly targeting the Service selector; the alternative of retagging pods is valid but more disruptive. No execution or verification phases ran, so those dimensions are N/A."", ""judge_input_tokens"": 2278, ""judge_output_tokens"": 119, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,

@@ -1,0 +1,71 @@
+conversation_group_id,tag,turn_id,metric_identifier,metric_metadata,result,score,threshold,reason,query,response,execution_time,evaluation_latency,api_input_tokens,api_output_tokens,judge_llm_input_tokens,judge_llm_output_tokens,embedding_tokens,judge_scores,time_to_first_token,streaming_duration,agent_latency,tokens_per_second,tool_calls,contexts,expected_response,expected_intent,expected_keywords,expected_tool_calls
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_status,,PASS,1.0,,Phase matches: Completed; All condition assertions passed,"The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+1 option(s) proposed
+
+### Option 0 (Approved): Correct Service Label Selector
+**Diagnosis:** ### Investigation Summary
+We investigated the Service `svc-selector-svc` in the namespace `svc-selector-test` because it was not serving any traffic.
+
+### Findings:
+1. **Service Configuration**: The service has the selector set to `app: svc-selector-app`.
+2. **Deployment/Pods Configuration**: There is only one active deployment and pod in this namespace named `svc-selector-demo`. The labels on these pods are `app: svc-selector-demo`.
+3. **Endpoints Status**: Because of this label selector mismatch (`svc-selector-app` vs `svc-selector-demo`), the Kubernetes endpoints controller is unable to match the service to the target pod. As a result, the endpoint list for `svc-selector-svc` is empty (`<none>`).
+
+### Impact:
+No traffic sent to the `svc-selector-svc` service is reaching the backing application, despite the application pod being healthy and in a `Running` state. (Confidence: )
+**Root Cause:** Service selector mismatch: service is configured with 'app: svc-selector-app' but backing pods have 'app: svc-selector-demo'
+**Proposed Actions:**
+1. [pre-check] Verify current service selector before making modifications
+2. [mutation] Patch the service selector to point to 'svc-selector-demo' pods
+3. [post-check] Check if endpoints are populated immediately after patching
+**Risk:**  | **Reversible:** Reversible
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",0.0003370959311723709,0.0003370959311723709,0,0,0,0,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""Phase matches: Completed; All condition assertions passed"", ""judge_input_tokens"": 0, ""judge_output_tokens"": 0, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,
+svc_selector_openai,{'agentic_svc_selector'},turn_1,custom:openshift_agentic_run_evaluation_correctness,,PASS,1.0,0.75,"OpenShift AgenticRun evaluation correctness: diagnosis=1.00, execution=N/A, verification=N/A, avg=1.00 — The diagnosis matches the expected root cause: the Service selector points to app=svc-selector-app while the healthy pods are labeled app=svc-selector-demo, which explains the empty endpoints and lack of traffic. No execution phase ran, so there were no remediation actions actually applied to evaluate. No verification phase ran either, so there is no evidence that endpoints were repopulated after a fix.","The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+","## Request
+
+The service svc-selector-svc in namespace svc-selector-test
+serves no traffic even though its backing application is
+running and healthy. Analyze the root cause and suggest a fix.
+
+
+## Analysis
+
+1 option(s) proposed
+
+### Option 0 (Approved): Correct Service Label Selector
+**Diagnosis:** ### Investigation Summary
+We investigated the Service `svc-selector-svc` in the namespace `svc-selector-test` because it was not serving any traffic.
+
+### Findings:
+1. **Service Configuration**: The service has the selector set to `app: svc-selector-app`.
+2. **Deployment/Pods Configuration**: There is only one active deployment and pod in this namespace named `svc-selector-demo`. The labels on these pods are `app: svc-selector-demo`.
+3. **Endpoints Status**: Because of this label selector mismatch (`svc-selector-app` vs `svc-selector-demo`), the Kubernetes endpoints controller is unable to match the service to the target pod. As a result, the endpoint list for `svc-selector-svc` is empty (`<none>`).
+
+### Impact:
+No traffic sent to the `svc-selector-svc` service is reaching the backing application, despite the application pod being healthy and in a `Running` state. (Confidence: )
+**Root Cause:** Service selector mismatch: service is configured with 'app: svc-selector-app' but backing pods have 'app: svc-selector-demo'
+**Proposed Actions:**
+1. [pre-check] Verify current service selector before making modifications
+2. [mutation] Patch the service selector to point to 'svc-selector-demo' pods
+3. [post-check] Check if endpoints are populated immediately after patching
+**Risk:**  | **Reversible:** Reversible
+
+## Outcome
+
+Sandbox completed; Execution step not configured; Verification step not configured in workflow",1.5561510960105807,1.5561510960105807,0,0,1995,119,0,"[{""judge_id"": ""primary"", ""score"": 1.0, ""reason"": ""OpenShift AgenticRun evaluation correctness: diagnosis=1.00, execution=N/A, verification=N/A, avg=1.00 \u2014 The diagnosis matches the expected root cause: the Service selector points to app=svc-selector-app while the healthy pods are labeled app=svc-selector-demo, which explains the empty endpoints and lack of traffic. No execution phase ran, so there were no remediation actions actually applied to evaluate. No verification phase ran either, so there is no evidence that endpoints were repopulated after a fix."", ""judge_input_tokens"": 1995, ""judge_output_tokens"": 119, ""embedding_tokens"": 0, ""verbose_logs"": null}]",,,0.0,,,,,,,
