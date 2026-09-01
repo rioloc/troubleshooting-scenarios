@@ -231,6 +231,27 @@ class TestGenerateReport:
         assert "**Pass rate**" in report
         assert "75% (3/4)" in report
 
+    def test_status_metric_fallback(self, tmp_path, capsys):
+        _write_run(
+            tmp_path / "gpt-5.4" / "run_1",
+            results=[_make_result(
+                "blocked_deployment_alert-remediation",
+                metric="custom:openshift_agentic_run_status",
+            )],
+            amended_entries=[{"conversation_id": "blocked_deployment_alert-remediation"}],
+        )
+        agent_runs = {
+            "gpt-5.4": [mod.load_run_summary(tmp_path / "gpt-5.4" / "run_1")]
+        }
+        conversations = mod.collect_conversations(agent_runs)
+
+        report = mod.generate_report(tmp_path)
+        mod.print_performance_table(conversations, ["gpt-5.4"], agent_runs)
+
+        assert "✅ 100% (1/1)" in report
+        assert "✅ 1.00" in report
+        assert "1/1" in capsys.readouterr().out
+
     def test_timestamp_in_header(self, tmp_path):
         _write_run(
             tmp_path / "gpt-5.4" / "run_1",
@@ -271,6 +292,23 @@ class TestGenerateReport:
             amended_entries=[{"conversation_id": "s1"}],
         )
         report = mod.generate_report(tmp_path)
+        assert "# Evaluation Summary" in report
+        assert "s1" in report
+
+    def test_handles_null_agentic_run_results(self, tmp_path):
+        run_dir = tmp_path / "gpt-5.4" / "run_1"
+        _write_run(
+            run_dir,
+            results=[_make_result("s1")],
+            amended_entries=[{"conversation_id": "s1"}],
+        )
+        amended_path = next(run_dir.glob("*amended*.yaml"))
+        amended = yaml.safe_load(amended_path.read_text())
+        amended[0]["turns"][0]["openshift_agentic_run_results"] = None
+        amended_path.write_text(yaml.dump(amended))
+
+        report = mod.generate_report(tmp_path)
+
         assert "# Evaluation Summary" in report
         assert "s1" in report
 

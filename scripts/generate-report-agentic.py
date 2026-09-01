@@ -105,7 +105,8 @@ def load_amended_entries(run_dir: Path) -> list[dict]:
                 continue
             turn = turns[0]
             duration = None
-            analysis_results = turn.get("openshift_agentic_run_results", {}).get("analysis", [])
+            agentic_run_results = turn.get("openshift_agentic_run_results") or {}
+            analysis_results = agentic_run_results.get("analysis", [])
             if analysis_results:
                 conditions = analysis_results[0].get("conditions", [])
                 started = next((c["lastTransitionTime"] for c in conditions if c["type"] == "Started"), None)
@@ -169,6 +170,21 @@ def get_judge_reason(results: list[dict], conversation_id: str, metric_id: str) 
     return ""
 
 
+def get_performance_result(
+    results: list[dict], conversation_id: str
+) -> tuple[str | None, float | None]:
+    """Return the preferred result and score for performance reporting.
+
+    Correctness is preferred when configured. Status-only evaluations do not
+    emit a correctness result, so use their deterministic status result.
+    """
+    for metric_id in (CORRECTNESS_METRIC, STATUS_METRIC):
+        result = get_result(results, conversation_id, metric_id)
+        if result is not None:
+            return result, get_score(results, conversation_id, metric_id)
+    return None, None
+
+
 def anchor_id(agent: str, conversation_id: str) -> str:
     return f"{agent}--{conversation_id}"
 
@@ -191,8 +207,7 @@ def score_cell(agent_runs: list, conversation_id: str, agent: str) -> str:
     for results in agent_runs:
         if results is None:
             continue
-        score = get_score(results, conversation_id, CORRECTNESS_METRIC)
-        result = get_result(results, conversation_id, CORRECTNESS_METRIC)
+        result, score = get_performance_result(results, conversation_id)
         if result is not None:
             scores.append((result, score))
 
@@ -231,7 +246,7 @@ def overall_score(agent_runs: list, conversations: list[str]) -> tuple[int, int]
         if results is None:
             continue
         for cid in conversations:
-            result = get_result(results, cid, CORRECTNESS_METRIC)
+            result, _ = get_performance_result(results, cid)
             if result is not None:
                 total += 1
                 if result == "PASS":
@@ -274,9 +289,9 @@ def mean_score(agent_runs: list, conversations: list[str]) -> float | None:
         if results is None:
             continue
         for cid in conversations:
-            s = get_score(results, cid, CORRECTNESS_METRIC)
-            if s is not None:
-                scores.append(s)
+            _, score = get_performance_result(results, cid)
+            if score is not None:
+                scores.append(score)
     if not scores:
         return None
     return sum(scores) / len(scores)
@@ -759,7 +774,7 @@ def _scenario_pass_total(agent_runs: list, conversation_id: str) -> tuple[int, i
     for results in agent_runs:
         if results is None:
             continue
-        result = get_result(results, conversation_id, CORRECTNESS_METRIC)
+        result, _ = get_performance_result(results, conversation_id)
         if result is not None:
             total += 1
             if result == "PASS":
